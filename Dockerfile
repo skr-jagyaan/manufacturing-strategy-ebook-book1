@@ -22,7 +22,7 @@ COPY chapters/        ./chapters/
 COPY onboarding/      ./onboarding/
 
 # Copy assets if they exist (workbook PDF etc.)
-COPY assets/          ./assets/
+COPY assets* ./assets/
 
 # Cloud Run requires PORT 8080
 ENV PORT=8080

@@ -185,7 +185,7 @@ function loadShelf() {
   const hasStarted = lastCh >= 1;
 
   const book1Cta  = hasStarted
-    ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh})">Continue Reading →</button>`
+    ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh}, true)">Continue Reading →</button>`
     : `<button class="btn btn-primary" onclick="loadOnboarding()">Begin Reading →</button>`;
 
   const stage = document.getElementById('stage');
@@ -1084,9 +1084,9 @@ function go(from, to) {
 }
 
 // ── CHAPTER-TO-CHAPTER NAVIGATION ──
-function goToChapter(num) {
+function goToChapter(num, force = false) {
   if (num < 1 || num > TOTAL_CHAPTERS) return;
-  navigate('/chapter/' + num);
+  navigate('/chapter/' + num, { force });
 }
 
 function goToBackmatter() {

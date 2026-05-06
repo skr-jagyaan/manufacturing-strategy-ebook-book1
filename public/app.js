@@ -1485,6 +1485,7 @@ window.submitLogin         = submitLogin;
 window.logout              = logout;
 window.navigate            = navigate;
 window.loadOnboarding      = loadOnboarding;
+window.loadShelf           = loadShelf;
 
 // ── INIT ──
 route();

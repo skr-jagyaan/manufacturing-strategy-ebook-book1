@@ -917,10 +917,6 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
         </div>`;
 
     case 'toc': {
-      const lastCh = getLastChapter();
-      const resumeBtn = lastCh >= 1
-        ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh})">Continue Reading — Chapter ${lastCh} →</button>`
-        : `<button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Continue →</button>`;
       return `
         <div class="screen-body">
           <div class="toc-wrap">
@@ -931,7 +927,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          ${resumeBtn}
+          <button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Continue →</button>
         </div>`;
     }
 
@@ -1028,7 +1024,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <button class="btn btn-primary" id="begin-btn" style="display:none" onclick="goToChapter(1)">Begin Chapter 1 →</button>
+          <button class="btn btn-primary" id="begin-btn" style="display:none" onclick="goToChapter(1)">Continue →</button>
         </div>`;
 
     default:

@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ── CONSTANTS ──
-const RAILWAY_URL = 'https://manufacturing-series-65462349033.asia-south1.run.app';
+const RAILWAY_URL = 'https://manufacturing-strategy-ebook-railwaysite-production.up.railway.app';
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──
@@ -1001,7 +1001,7 @@ function go(from, to) {
   const screens = currentChapter?.screens;
   if (screens && to > from) {
     const fromType = screens[from]?.type;
-    if (fromType === 'form' || fromType === 'vikram') return;
+    if (fromType === 'vikram') return;
   }
 
   isTransitioning = true;

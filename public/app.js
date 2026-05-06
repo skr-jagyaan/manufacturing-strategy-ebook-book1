@@ -719,7 +719,7 @@ function renderScreen(screen, idx, total) {
             <div class="prose" style="margin-bottom:32px;">
               <p>${screen.body.replace(/\n/g, '</p><p>')}</p>
             </div>
-            <a href="/assets/workbook.pdf" download id="workbook-download-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;text-decoration:none;" onclick="markWorkbookDownloaded()">
+            <a href="/workbook.pdf" download id="workbook-download-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;text-decoration:none;" onclick="markWorkbookDownloaded()">
               Download Workbook →
             </a>
           </div>

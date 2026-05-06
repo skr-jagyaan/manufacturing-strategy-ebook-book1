@@ -1024,7 +1024,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <button class="btn btn-primary" id="begin-btn" style="display:none" onclick="goToChapter(1)">Continue →</button>
+          <button class="btn btn-primary" id="begin-btn" style="display:none" onclick="goToChapter(1, true)">Continue →</button>
         </div>`;
 
     default:

@@ -520,7 +520,7 @@ function renderScreen(screen, idx, total) {
         <div class="screen-footer">
           ${currentChapter?.chapterNum > 1
             ? `<button class="btn btn-ghost" onclick="goToChapter(${(currentChapter?.chapterNum || 1) - 1})">← Chapter ${(currentChapter?.chapterNum || 1) - 1}</button>`
-            : '<span></span>'}
+            : `<button class="btn btn-ghost" onclick="loadOnboarding()">← Contents</button>`}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
           <button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Begin Chapter →</button>
         </div>`;

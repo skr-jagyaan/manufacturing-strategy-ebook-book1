@@ -179,7 +179,7 @@ function loadShelf() {
 
   const book1Cta  = hasStarted
     ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh})">Continue Reading →</button>`
-    : `<button class="btn btn-primary" onclick="navigate('/')">Begin Reading →</button>`;
+    : `<button class="btn btn-primary" onclick="loadOnboarding()">Begin Reading →</button>`;
 
   const stage = document.getElementById('stage');
   stage.innerHTML = `
@@ -1480,6 +1480,7 @@ window.loadDiagnosisData   = loadDiagnosisData;
 window.submitLogin         = submitLogin;
 window.logout              = logout;
 window.navigate            = navigate;
+window.loadOnboarding      = loadOnboarding;
 
 // ── INIT ──
 route();

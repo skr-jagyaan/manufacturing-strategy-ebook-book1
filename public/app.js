@@ -88,7 +88,7 @@ async function route() {
   const r = getRoute();
 
   if (r.type === 'onboarding') {
-    // If already onboarded, jump to last chapter/screen
+    // If already onboarded, jump to last chapter
     if (isOnboarded()) {
       const last = getLastChapter();
       if (last >= 1) {
@@ -96,6 +96,7 @@ async function route() {
         return;
       }
     }
+    // Otherwise always start from cover (screen 0)
     await loadOnboarding();
     return;
   }
@@ -177,7 +178,7 @@ async function loadOnboarding() {
 
     buildScreens(ob.screens);
     totalScreens = ob.screens.length;
-    currentScreen = 0;
+    currentScreen = 0;  // Onboarding always starts from cover — never resume
 
     buildDots();
     hideLoader();

@@ -1,9 +1,8 @@
 {
-  "name": "why-great-manufacturers-stay-invisible",
+  "name": "manufacturing-strategy-series",
   "version": "1.0.0",
-  "description": "Interactive book reading experience — Why Great Manufacturers Stay Invisible by Sudharsan K R",
+  "description": "The Manufacturing Strategy Series — reader portal + book app",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
@@ -13,6 +12,8 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.7",
+    "pg": "^8.11.3"
   }
 }

@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ── CONSTANTS ──
-const RAILWAY_URL = 'https://manufacturing-strategy-ebook-railwaysite-production.up.railway.app';
+const RAILWAY_URL = 'https://your-railway-app.up.railway.app';
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──
@@ -227,6 +227,10 @@ async function loadDiagnosis() {
 
     buildDots();
     hideLoader();
+
+    // Trigger diagnosis data load automatically on first screen
+    setTimeout(loadDiagnosisData, 800);
+
   } catch (err) {
     console.error('Failed to load diagnosis', err);
     showError();
@@ -529,8 +533,83 @@ function renderScreen(screen, idx, total) {
     case 'vikram':
       return renderOnboardingScreen(screen, idx, total, prevBtn);
 
-    default:
-      return `<div class="screen-body"><p>Unknown screen type: ${screen.type}</p></div>`;
+    case 'diagnosis-loading':
+      return `
+        <div class="screen-body center">
+          <div class="end-wrap" style="text-align:center;">
+            <div id="diag-loading">
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:24px;">
+                <div class="loader-dot"></div>
+                <div class="loader-dot"></div>
+                <div class="loader-dot"></div>
+              </div>
+              <div style="font:600 1.125rem/1.3 'Inter',sans-serif;color:var(--ink);margin-bottom:8px;">Sudharsan is reviewing your notes</div>
+              <div style="font:400 0.9375rem/1.6 'Inter',sans-serif;color:var(--ink-3);">Across all nine chapters. This takes a moment.</div>
+            </div>
+            <div id="diag-error" style="display:none;">
+              <div style="font:600 1.125rem/1.3 'Inter',sans-serif;color:var(--ink);margin-bottom:8px;">Something went wrong</div>
+              <div style="font:400 0.9375rem/1.6 'Inter',sans-serif;color:var(--ink-3);margin-bottom:24px;">Unable to generate your diagnosis right now. Please try again.</div>
+              <button class="btn btn-primary" onclick="loadDiagnosisData()">Try Again</button>
+            </div>
+          </div>
+        </div>
+        <div class="screen-footer">
+          <span></span>
+          <span class="screen-ctr">${idx + 1} of ${total}</span>
+          <span></span>
+        </div>`;
+
+    case 'diagnosis-result':
+      return `
+        <div class="screen-body">
+          <div class="content-wrap">
+            <div style="font:500 0.75rem/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px;">Your Strategic Diagnosis</div>
+            <div style="font:700 2rem/1.2 'Inter',sans-serif;color:var(--ink);margin-bottom:32px;letter-spacing:-0.5px;" id="diag-name">From Sudharsan K R</div>
+
+            <div id="diag-content" style="display:none;animation:fadeUp 0.5s ease forwards;">
+
+              <div style="margin-bottom:28px;">
+                <div style="font:600 0.75rem/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px;">Where You Are</div>
+                <div id="diag-position" class="prose"><p></p></div>
+              </div>
+
+              <div style="margin-bottom:28px;padding:20px 24px;background:var(--bg);border-radius:8px;border-left:3px solid var(--ink);">
+                <div style="font:600 0.75rem/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px;">The Primary Constraint</div>
+                <div id="diag-constraint" class="prose"><p></p></div>
+              </div>
+
+              <div style="margin-bottom:28px;padding:20px 24px;background:var(--blue-light);border-radius:8px;border-left:3px solid var(--blue);">
+                <div style="font:600 0.75rem/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;">The Strategic Choice — Next 90 Days</div>
+                <div id="diag-choice" class="prose"><p></p></div>
+              </div>
+
+              <div style="border-top:1px solid var(--rule);padding-top:24px;margin-bottom:8px;">
+                <div id="diag-closing" style="font:400 1.0625rem/1.75 'Inter',sans-serif;color:var(--ink-2);font-style:italic;"></div>
+                <div style="font:500 0.8125rem/1 'Inter',sans-serif;color:var(--ink-3);margin-top:10px;">— Sudharsan K R</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="screen-footer">
+          <span></span>
+          <span class="screen-ctr">${idx + 1} of ${total}</span>
+          <button class="btn btn-primary" id="diag-next-btn" style="display:none" onclick="go(${idx}, ${idx + 1})">Continue →</button>
+        </div>`;
+
+    case 'working-with-author':
+      return `
+        <div class="screen-body">
+          <div class="content-wrap">
+            <div class="section-title">${screen.heading}</div>
+            <div class="prose">${screen.body}</div>
+          </div>
+        </div>
+        <div class="screen-footer">
+          ${prevBtn}
+          <span class="screen-ctr">${idx + 1} of ${total}</span>
+          <span></span>
+        </div>`;
   }
 }
 
@@ -727,8 +806,10 @@ function go(from, to) {
     if (screens[to]?.type === 'end') {
       populateEndScreen();
     }
-    // If vikram screen, trigger typewriter
-    if (screens[to]?.type === 'vikram') {
+    // If diagnosis loading screen, trigger API call
+    if (screens[to]?.type === 'diagnosis-loading') {
+      setTimeout(loadDiagnosisData, 600);
+    }
       setTimeout(typeVikramIntro, 300);
     }
     // If vikram closing screen, trigger typewriter
@@ -833,7 +914,77 @@ function typeVikramIntro() {
   setTimeout(type, 300);
 }
 
-// ── BOOK-LEVEL TAKEAWAY SUBMISSION ──
+// ── DIAGNOSIS DATA LOADER ──
+async function loadDiagnosisData() {
+  const user         = getUser();
+  const allTakeaways = getAllTakeaways();
+  const bookTakeaways = JSON.parse(localStorage.getItem('bookTakeaways') || '[]');
+
+  const loadingEl = document.getElementById('diag-loading');
+  const errorEl   = document.getElementById('diag-error');
+
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (errorEl)   errorEl.style.display   = 'none';
+
+  try {
+    const controller = new AbortController();
+    const timeout    = setTimeout(() => controller.abort(), 20000); // 20s for diagnosis
+
+    const res = await fetch(RAILWAY_URL + '/api/diagnosis', {
+      method:  'POST',
+      signal:  controller.signal,
+      headers: {
+        'Content-Type':    'application/json',
+        'x-reader-email':  localStorage.getItem('readerEmail') || '',
+        'x-reader-token':  localStorage.getItem('readerToken') || ''
+      },
+      body: JSON.stringify({
+        userName:     user.name,
+        userRev:      user.rev,
+        userSector:   user.sector,
+        allTakeaways,
+        bookTakeaways
+      })
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) throw new Error('Server error');
+
+    const data = await res.json();
+
+    // Hide loading, move to result screen
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    // Navigate to result screen (screen 1)
+    go(0, 1);
+
+    // Populate after a short delay to let screen render
+    setTimeout(() => {
+      const nameEl       = document.getElementById('diag-name');
+      const positionEl   = document.getElementById('diag-position');
+      const constraintEl = document.getElementById('diag-constraint');
+      const choiceEl     = document.getElementById('diag-choice');
+      const closingEl    = document.getElementById('diag-closing');
+      const contentEl    = document.getElementById('diag-content');
+      const nextBtn      = document.getElementById('diag-next-btn');
+
+      if (nameEl)       nameEl.textContent       = `For ${user.name}`;
+      if (positionEl)   positionEl.innerHTML      = `<p>${data.position}</p>`;
+      if (constraintEl) constraintEl.innerHTML    = `<p>${data.constraint}</p>`;
+      if (choiceEl)     choiceEl.innerHTML        = `<p>${data.choice}</p>`;
+      if (closingEl)    closingEl.textContent     = `"${data.closing}"`;
+      if (contentEl)    contentEl.style.display   = 'block';
+      if (nextBtn)      nextBtn.style.display     = 'inline-flex';
+
+    }, 300);
+
+  } catch (err) {
+    console.error('Diagnosis error:', err.message);
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (errorEl)   errorEl.style.display   = 'block';
+  }
+}
 async function submitBookTakeaways(nextScreenIdx) {
   const t1 = document.getElementById('t1')?.value?.trim() || '';
   const t2 = document.getElementById('t2')?.value?.trim() || '';
@@ -1063,6 +1214,7 @@ window.submitForm          = submitForm;
 window.submitTakeaways     = submitTakeaways;
 window.submitBookTakeaways = submitBookTakeaways;
 window.checkInputs         = checkInputs;
+window.loadDiagnosisData   = loadDiagnosisData;
 
 // ── INIT ──
 route();

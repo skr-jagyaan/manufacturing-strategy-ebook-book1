@@ -517,6 +517,7 @@ function renderScreen(screen, idx, total) {
           <span class="screen-ctr">${idx + 1} of ${total}</span>
           <span></span>
         </div>`;
+    case 'cover':
     case 'copyright':
     case 'toc':
     case 'preface':

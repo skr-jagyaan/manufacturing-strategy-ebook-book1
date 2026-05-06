@@ -402,7 +402,7 @@ async function loadChapter(num) {
 }
 
 // ── ONBOARDING LOADER ──
-async function loadOnboarding() {
+async function loadOnboarding(startScreen = 0) {
   showLoader();
   try {
     const module = await import('/onboarding/onboarding.js');
@@ -421,6 +421,18 @@ async function loadOnboarding() {
     buildScreens(currentChapter.screens);
     totalScreens = currentChapter.screens.length;
     currentScreen = 0;
+
+    // If startScreen specified (e.g. coming back from Chapter 1), land there
+    const target = startScreen > 0 && startScreen < totalScreens ? startScreen : 0;
+    if (target > 0) {
+      for (let i = 0; i < target; i++) {
+        const el = document.getElementById('sc-' + i);
+        if (el) { el.classList.remove('active'); el.classList.add('done'); }
+      }
+      const targetEl = document.getElementById('sc-' + target);
+      if (targetEl) targetEl.classList.add('active');
+      currentScreen = target;
+    }
 
     buildDots();
     hideLoader();
@@ -520,7 +532,7 @@ function renderScreen(screen, idx, total) {
         <div class="screen-footer">
           ${currentChapter?.chapterNum > 1
             ? `<button class="btn btn-ghost" onclick="goToChapter(${(currentChapter?.chapterNum || 1) - 1})">← Chapter ${(currentChapter?.chapterNum || 1) - 1}</button>`
-            : `<button class="btn btn-ghost" onclick="loadOnboarding()">← Contents</button>`}
+            : `<button class="btn btn-ghost" onclick="loadOnboarding(parseInt(localStorage.getItem('lastOnboardingScreen') || '0'))">← Back</button>`}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
           <button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Begin Chapter →</button>
         </div>`;
@@ -1055,7 +1067,12 @@ function go(from, to) {
 
   // Save screen position
   if (currentChapter) {
-    saveLastScreen(currentChapter.chapterNum, to);
+    if (currentChapter.chapterNum) {
+      saveLastScreen(currentChapter.chapterNum, to);
+    } else {
+      // Onboarding — save separately
+      localStorage.setItem('lastOnboardingScreen', to);
+    }
   }
 
   updateDots();

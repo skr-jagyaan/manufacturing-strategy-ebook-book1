@@ -247,7 +247,39 @@ html, body {
    CONTENT
    ============================================================ */
 .content-wrap {
-  max-width: 100%;
+  width: 100%;
+}
+
+.prose-wrap {
+  width: 100%;
+}
+
+.opener-wrap {
+  width: 100%;
+}
+
+.cover-wrap {
+  width: 100%;
+}
+
+.copy-wrap {
+  width: 100%;
+}
+
+.toc-wrap {
+  width: 100%;
+}
+
+.exchange-wrap {
+  width: 100%;
+}
+
+.ate-wrap {
+  width: 100%;
+}
+
+.vikram-wrap {
+  width: 100%;
 }
 
 .section-title {

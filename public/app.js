@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ── CONSTANTS ──
-const RAILWAY_URL = 'https://manufacturing-strategy-ebook-railwaysite-production.up.railway.app';
+const RAILWAY_URL = 'https://manufacturing-series-65462349033.asia-south1.run.app';
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──

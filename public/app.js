@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ── CONSTANTS ──
-const RAILWAY_URL = 'https://manufacturing-strategy-ebook-railwaysite-production.up.railway.app';
+const RAILWAY_URL = 'https://manufacturing-series-65462349033.asia-south1.run.app';
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──
@@ -119,10 +119,9 @@ function loadLogin() {
   document.getElementById('bar-sep').style.display = 'none';
   document.getElementById('bar-ch').textContent = '';
   document.getElementById('dots').innerHTML = '';
+  document.getElementById('bar-shelf-btn').style.display = 'none';
 
   hideLoader();
-
-  // Focus email input
   setTimeout(() => document.getElementById('login-email')?.focus(), 100);
 }
 
@@ -245,6 +244,7 @@ function loadShelf() {
   document.getElementById('bar-sep').style.display = 'none';
   document.getElementById('bar-ch').textContent = '';
   document.getElementById('dots').innerHTML = '';
+  document.getElementById('bar-shelf-btn').style.display = 'none';
 
   hideLoader();
 }
@@ -347,6 +347,7 @@ async function loadChapter(num) {
     document.getElementById('bar-book').textContent = 'Book One';
     document.getElementById('bar-sep').style.display = '';
     document.getElementById('bar-ch').textContent = currentChapter.barTitle;
+    document.getElementById('bar-shelf-btn').style.display = 'inline-flex';
 
     // Build screens into stage
     buildScreens(currentChapter.screens);
@@ -389,6 +390,7 @@ async function loadOnboarding() {
     document.getElementById('bar-book').textContent = 'Why Great Manufacturers Stay Invisible';
     document.getElementById('bar-sep').style.display = 'none';
     document.getElementById('bar-ch').textContent = '';
+    document.getElementById('bar-shelf-btn').style.display = 'inline-flex';
 
     buildScreens(currentChapter.screens);
     totalScreens = currentChapter.screens.length;
@@ -412,6 +414,7 @@ async function loadBackmatter() {
     document.getElementById('bar-book').textContent = 'Book One';
     document.getElementById('bar-sep').style.display = '';
     document.getElementById('bar-ch').textContent = 'Why Great Manufacturers Stay Invisible';
+    document.getElementById('bar-shelf-btn').style.display = 'inline-flex';
 
     buildScreens(currentChapter.screens);
     totalScreens = currentChapter.screens.length;
@@ -435,6 +438,7 @@ async function loadDiagnosis() {
     document.getElementById('bar-book').textContent = 'Book One';
     document.getElementById('bar-sep').style.display = '';
     document.getElementById('bar-ch').textContent = 'Your Strategic Diagnosis';
+    document.getElementById('bar-shelf-btn').style.display = 'inline-flex';
 
     buildScreens(diag.screens);
     totalScreens = diag.screens.length;

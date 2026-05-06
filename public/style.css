@@ -132,7 +132,24 @@ html, body {
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── SCREEN BODY ── */
+.bar-shelf-btn {
+  font: 500 0.75rem/1 'Inter', sans-serif;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+.bar-shelf-btn:hover {
+  color: var(--ink);
+  background: var(--bg-2);
+}
+
+
 .screen-body {
   flex: 1;
   overflow-y: auto;

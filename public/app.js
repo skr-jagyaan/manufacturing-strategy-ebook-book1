@@ -88,15 +88,8 @@ async function route() {
   const r = getRoute();
 
   if (r.type === 'onboarding') {
-    // If already onboarded, jump to last chapter
-    if (isOnboarded()) {
-      const last = getLastChapter();
-      if (last >= 1) {
-        navigate('/chapter/' + last, { force: true });
-        return;
-      }
-    }
-    // Otherwise always start from cover (screen 0)
+    // Always load onboarding from cover — no skipping
+    // If returning reader, they navigate to their chapter via TOC or continue button
     await loadOnboarding();
     return;
   }
@@ -170,15 +163,15 @@ async function loadOnboarding() {
   showLoader();
   try {
     const module = await import('/onboarding/onboarding.js');
-    const ob = module.default;
+    currentChapter = module.default;
 
     document.getElementById('bar-book').textContent = 'Why Great Manufacturers Stay Invisible';
     document.getElementById('bar-sep').style.display = 'none';
     document.getElementById('bar-ch').textContent = '';
 
-    buildScreens(ob.screens);
-    totalScreens = ob.screens.length;
-    currentScreen = 0;  // Onboarding always starts from cover — never resume
+    buildScreens(currentChapter.screens);
+    totalScreens = currentChapter.screens.length;
+    currentScreen = 0;
 
     buildDots();
     hideLoader();
@@ -658,6 +651,10 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
         </div>`;
 
     case 'toc':
+      const lastCh = getLastChapter();
+      const resumeBtn = lastCh >= 1
+        ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh})">Continue Reading — Chapter ${lastCh} →</button>`
+        : `<button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Continue →</button>`;
       return `
         <div class="screen-body">
           <div class="toc-wrap">
@@ -668,7 +665,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Continue →</button>
+          ${resumeBtn}
         </div>`;
 
     case 'preface':
@@ -776,6 +773,13 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
 function go(from, to) {
   if (isTransitioning) return;
   if (to < 0 || to >= totalScreens) return;
+
+  // Block forward navigation on form screen — must use Submit button
+  const screens = currentChapter?.screens;
+  if (screens && to > from) {
+    const fromType = screens[from]?.type;
+    if (fromType === 'form' || fromType === 'vikram') return;
+  }
 
   isTransitioning = true;
 
@@ -1187,13 +1191,37 @@ window.addEventListener('popstate', () => route());
 
 // ── KEYBOARD NAVIGATION ──
 document.addEventListener('keydown', e => {
-  if (['ArrowRight', 'ArrowDown', 'PageDown'].includes(e.key)) {
+  const screen = document.getElementById('sc-' + currentScreen);
+  const screenBody = screen?.querySelector('.screen-body');
+  const screenType = getCurrentScreenType();
+
+  // Block all navigation on form and vikram screens
+  if (screenType === 'form' || screenType === 'vikram') return;
+
+  // Up/Down arrows scroll content, not navigate
+  if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
+    if (screenBody) {
+      e.preventDefault();
+      screenBody.scrollBy({ top: e.key === 'ArrowDown' ? 120 : -120, behavior: 'smooth' });
+    }
+    return;
+  }
+
+  // Left/Right and Page keys navigate screens
+  if (['ArrowRight', 'PageDown'].includes(e.key)) {
     go(currentScreen, currentScreen + 1);
   }
-  if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) {
     go(currentScreen, currentScreen - 1);
   }
 });
+
+function getCurrentScreenType() {
+  // Get the type of current screen from the loaded chapter/onboarding
+  const screens = currentChapter?.screens;
+  if (!screens) return null;
+  return screens[currentScreen]?.type || null;
+}
 
 // ── SWIPE NAVIGATION ──
 let touchStartX = 0;

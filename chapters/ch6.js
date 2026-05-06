@@ -25,7 +25,7 @@ export default {
       intro: 'Why deliberately turning away work is the most profitable decision a manufacturing founder can make — and why it is so terrifying.'
     },
 
-    // SCREEN 1 — The Terror of Focus
+    // SCREEN 1 — The Terror of the Turnaround
     {
       type:    'content',
       heading: 'The most frightening word in strategy',
@@ -36,23 +36,35 @@ export default {
         <p>So she does the unthinkable: when the washing machine company asks for their annual 5% price reduction, Meera politely declines. When a new e-rickshaw company asks for a quotation, she refuses to quote. Instead, she pivots her entire facility to focus exclusively on complex wiring harnesses for medical diagnostic equipment.</p>`
     },
 
-    // SCREEN 2 — Focus Turns Into Brand
+    // SCREEN 2 — The Inevitable Dip
     {
       type:    'content',
-      heading: 'How focus becomes brand',
+      heading: 'The inevitable dip',
       body: `
-        <p>What happens next is the hardest part of strategy. In the short term, Meera's revenue takes a massive hit. Top-line turnover drops from ₹15 Crore to ₹8 Crore. Her production floor, which used to buzz with chaotic energy, suddenly has quiet corners. Her sales team panics.</p>
-        <p>But Meera holds her nerve. Because she is no longer distracted by building cheap cables for washing machines at a break-even price, she channels 100% of her company's capital, time, and engineering bandwidth into becoming the undisputed expert in medical wiring.</p>
+        <p>What happens next is the hardest part of strategy. In the short term, Meera's revenue takes a massive hit. Top-line turnover drops from ₹15 Crore to ₹8 Crore. Her production floor, which used to buzz with chaotic energy, suddenly has quiet corners. Her sales team panics. Meera is terrified.</p>
+        <p>But Meera holds her nerve. Because she is no longer distracted by building cheap cables for washing machines at a break-even price, she channels 100% of her company's capital, time, and engineering bandwidth into becoming the undisputed expert in medical wiring.</p>`,
+      extra: `
+        <div class="pull-quote">
+          <p>"The dip is not a sign that focus is failing. It is a sign that the strategy is working."</p>
+        </div>`
+    },
+
+    // SCREEN 3 — The Formula for Brand
+    {
+      type:    'content',
+      heading: 'The formula for brand',
+      body: `
         <p>Over time, Meera's singular focus turns into a formidable reputation within the medical device industry. When a new medical startup needs complex wiring, investors and industry veterans tell them: <em>"Do not risk your FDA approval with a general job shop. Go to Meera's company in Chennai. They are the medical wiring people."</em></p>
-        <p>Meera did not build this reputation by running advertisements. She built it by making a hard, terrifying strategic choice about where she would compete — and more importantly, where she would not.</p>
-        <p><strong>Focus turns into reputation. Reputation becomes brand.</strong></p>`,
+        <p>Meera did not build this reputation by running advertisements. She built it by making a hard, terrifying strategic choice about where she would compete — and more importantly, where she would not. She accepted the short-term drop in revenue to secure long-term pricing power.</p>
+        <p><strong>Focus turns into reputation. Reputation becomes brand.</strong></p>
+        <p>Every manufacturing business sits somewhere on the spectrum between commodity generalist and focused specialist. The advisory work is about understanding precisely where — and what the next deliberate move looks like.</p>`,
       extra: `
         <div class="pull-quote">
           <p>"Focus turns into reputation. And reputation becomes brand."</p>
         </div>`
     },
 
-    // SCREEN 3 — Pushback
+    // SCREEN 4 — What Founders Tell Themselves
     {
       type:    'content',
       heading: 'What founders tell themselves',
@@ -65,7 +77,7 @@ export default {
           </div>
           <div class="pb-a">
             <div class="pb-a-label">The Reality</div>
-            <div class="pb-a-text">You are worshipping at the altar of machine utilisation instead of profitability. Running a machine at 100% capacity on a zero-margin job actively destroys wealth. It burns electricity, wears down your spindles, and exhausts your labour — all for the privilege of trading rupees with a cheap customer. An idle machine is not a liability; it is strategic capacity waiting for a highly profitable order. Margin is sanity. Volume is vanity.</div>
+            <div class="pb-a-text">You are worshipping at the altar of machine utilisation instead of profitability. Running a machine at 100% capacity on a zero-margin job actually destroys wealth. It burns electricity, wears down your spindles, and exhausts your labour, all for the privilege of trading rupees with a cheap customer. An idle machine is not a liability; it is strategic capacity waiting for a highly profitable order. Margin is sanity; volume is vanity.</div>
           </div>
         </div>
         <div class="pushback">
@@ -80,10 +92,10 @@ export default {
         </div>`
     },
 
-    // SCREEN 4 — Exchange
+    // SCREEN 5 — Exchange
     { type: 'exchange' },
 
-    // SCREEN 5 — End
+    // SCREEN 6 — End
     {
       type:      'end',
       nextTitle: 'The Real Growth Problem'

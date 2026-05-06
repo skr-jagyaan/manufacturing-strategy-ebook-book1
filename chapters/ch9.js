@@ -25,27 +25,37 @@ export default {
       intro: 'Strategy is not a document. It is a daily set of choices — and it begins with a single decision you have been avoiding.'
     },
 
-    // SCREEN 1 — Look Again
+    // SCREEN 1 — The Factory Floor
     {
       type:    'content',
-      heading: 'Look at your factory floor again',
+      heading: 'Walk out onto the factory floor',
       body: `
         <p>Walk out of your office right now and stand on your factory floor. Listen to the rhythmic thud of the power presses. Listen to the high-pitched whine of the CNC turning centres. Smell the sharp, metallic tang of the cutting fluid. Watch your operators load heavy raw material into the hoppers. Watch the dispatch trucks backing into the loading bay.</p>
         <p>Before you read this book, you likely looked at this exact scene and saw operational effort. You saw a group of hardworking people operating expensive machinery to get orders out the door. You saw the daily, exhausting grind of survival and accumulation.</p>
-        <p>Now, look closer. Look at your business through the lens of strategy.</p>
-        <p>Look at the specific parts coming off the line. Look at the labels on the dispatch crates. Ask yourself: who are these parts actually for? Why are we making them? Are these machines actively building a highly profitable, defensible reputation — or are we just renting out our spindle hours to the lowest bidder?</p>
-        <p>That question — <em>are we building a reputation or just surviving?</em> — is the beginning of strategy.</p>`
+        <p>Now, look closer. Look at your business through the lens of strategy.</p>`
     },
 
-    // SCREEN 2 — Strategy Is Daily
+    // SCREEN 2 — The Strategic Lens
     {
       type:    'content',
-      heading: 'Strategy is a daily set of choices',
+      heading: 'The strategic lens',
+      body: `
+        <p>Look at the specific parts coming off the line. Look at the labels on the dispatch crates. Ask yourself: who are these parts actually for? Why are we making them? Are these machines actively building a highly profitable, defensible reputation — or are we just renting out our spindle hours to the lowest bidder?</p>
+        <p>That question — <em>are we building a reputation or just surviving?</em> — is the beginning of strategy.</p>`,
+      extra: `
+        <div class="pull-quote">
+          <p>"Are these machines building a defensible reputation — or are we just renting out our spindle hours to the lowest bidder?"</p>
+        </div>`
+    },
+
+    // SCREEN 3 — Strategy Is Not a Document
+    {
+      type:    'content',
+      heading: 'Strategy is not a document',
       body: `
         <p>Strategy is not a document that sits in a drawer. Strategy is a living, breathing set of daily choices.</p>
-        <p>When you decide not to quote for a job because it falls outside your new Where to Play criteria, that is strategy. When you refuse to drop your price to match a cheap competitor because you know your How to Win delivers uncopyable value, that is strategy. When you tell a new customer that you only serve medical device manufacturers and politely decline their automotive enquiry, that is strategy.</p>
-        <p>You do not need a perfect plan to start. You simply need to stop making the unforced errors that keep you commoditised.</p>
-        <p>You need to stop asking for evidence about the future, and start asking: <strong>What Would Have to Be True?</strong></p>
+        <p>When you decide not to quote for a job because it falls outside your new Where to Play criteria, that is strategy. When you refuse to drop your price to match a cheap competitor because you know your How to Win delivers uncopyable value, that is strategy.</p>
+        <p>You do not need a perfect plan to start. You simply need to stop making the unforced errors that keep you commoditised. You need to stop asking for evidence about the future, and start asking: <strong>What Would Have to Be True?</strong></p>
         <p>You need to stop accumulating every opportunity that falls into your lap, and start making deliberate choices about which opportunities to pursue and which to decline.</p>
         <p>You need to stop spreading your resources across every customer, every industry, every machine hour — and start concentrating them in the direction of a defensible, premium position.</p>
         <p><strong>Identifying your lack of strategy was the purpose of this book. Actually designing and executing a winning strategy is the subject of the next one.</strong></p>`,
@@ -55,7 +65,7 @@ export default {
         </div>`
     },
 
-    // SCREEN 3 — Pushback
+    // SCREEN 4 — What Founders Tell Themselves
     {
       type:    'content',
       heading: 'What founders tell themselves',
@@ -83,10 +93,10 @@ export default {
         </div>`
     },
 
-    // SCREEN 4 — Exchange
+    // SCREEN 5 — Exchange
     { type: 'exchange' },
 
-    // SCREEN 5 — End (goes to back matter, not diagnosis directly)
+    // SCREEN 6 — End
     {
       type:      'end',
       nextTitle: 'Continue the Journey'

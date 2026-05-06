@@ -25,27 +25,38 @@ export default {
       intro: 'When your entire business gets reduced to a single row on a buyer\'s Excel spreadsheet — and how to escape it.'
     },
 
-    // SCREEN 1 — The Excel Spreadsheet Reality
+    // SCREEN 1 — The Story
+    {
+      type:    'content',
+      heading: 'The most dangerous place in the industrial world',
+      body: `
+        <p>When a business spreads itself too thinly across too many markets, it inevitably loses its unique edge. It becomes a generalist. And when a manufacturing company loses its edge, it falls straight into the most dangerous place in the industrial world: the Commodity Trap.</p>
+        <p>Imagine a manufacturer named Amit who runs a highly capable fastener production unit in Ludhiana. He makes high-tensile bolts and precision screws for heavy earthmoving equipment. He has great machines, a skilled workforce, and runs a tight, efficient ship.</p>
+        <p>One day he receives a massive RFQ from a major heavy equipment manufacturer. His engineering team spends three days calculating machine hours, material costs, and tooling requirements. They submit a highly detailed, extremely fair quotation.</p>
+        <p>Two weeks later, the purchasing manager calls: <em>"Amit, your technicals are approved. Your quality looks great. But your price is 4% higher than a vendor in Rajkot. You are L2. If you can match their L1 price, the order is yours."</em></p>`
+    },
+
+    // SCREEN 2 — The Excel Spreadsheet Reality
     {
       type:    'content',
       heading: 'The Excel spreadsheet reality',
       body: `
-        <p>Imagine a manufacturer named Amit who runs a highly capable fastener production unit in Ludhiana. He makes high-tensile bolts and precision screws for heavy earthmoving equipment. He has great machines, a skilled workforce, and runs a tight, efficient operation.</p>
-        <p>One day he receives a massive RFQ from a major heavy equipment manufacturer. His engineering team spends three days calculating machine hours, material costs, and tooling requirements. They submit a highly detailed, extremely fair quotation.</p>
-        <p>Two weeks later, the purchasing manager calls: <em>"Amit, your technicals are approved. Your quality looks great. But your price is 4% higher than a vendor in Rajkot. You are L2. If you can match their L1 price, the order is yours."</em></p>
         <p>Purchasing managers are not paid to admire your engineering skills. They are paid to reduce costs. Their annual bonuses are tied to how much money they can squeeze out of the supply chain.</p>
-        <p>When they send out an RFQ, they standardise the specifications so that any capable factory can quote. They take your complex, beautiful manufacturing business and reduce it to a single row on a massive Excel spreadsheet:</p>
+        <p>When they send out an RFQ, they standardise the specifications so that any capable factory can quote. They take your complex, beautiful manufacturing business and reduce it to a single row on a massive Excel spreadsheet.</p>
         <p><em>Supplier A: ₹12.50 per piece. Supplier B: ₹12.00 per piece.</em></p>
-        <p><strong>When your entire business is reduced to a spreadsheet, orders go to the lowest bidder.</strong></p>`
+        <p><strong>When your entire business is reduced to a spreadsheet, orders go to the lowest bidder.</strong></p>`,
+      extra: `
+        <div class="pull-quote">
+          <p>"When your entire business is reduced to a spreadsheet, orders go to the lowest bidder."</p>
+        </div>`
     },
 
-    // SCREEN 2 — Operating Imperatives vs Strategic Advantage
+    // SCREEN 3 — The Illusion of Quality and Service
     {
       type:    'content',
       heading: 'The illusion of quality and service',
       body: `
-        <p>When founders find themselves trapped in this cycle of price competition, they feel deeply misunderstood. If you ask a founder in the Commodity Trap why a customer should choose them over the cheapest competitor, they almost always give the same three answers:</p>
-        <p><em>Excellent quality. On-time delivery. Great customer service.</em></p>
+        <p>When founders find themselves trapped in this cycle of price competition, they often feel deeply misunderstood. If you ask a founder in the Commodity Trap why a customer should choose them over the cheapest competitor, they almost always give the same three answers: excellent quality, on-time delivery, great customer service.</p>
         <p>These are incredibly important qualities. But here is the unforgiving truth of the modern industrial market: <strong>they are not strategic advantages. They are Operating Imperatives</strong> — the absolute minimum standard required just to stay in business.</p>
         <p>If you do not have good quality and on-time delivery, you do not even get invited to quote. When you tell a purchasing manager that your main advantage is quality, they hear: <em>we have brakes.</em> Every serious competitor you face also claims excellent quality and perfect reliability.</p>`,
       extra: `
@@ -54,7 +65,7 @@ export default {
         </div>`
     },
 
-    // SCREEN 3 — Pushback
+    // SCREEN 4 — What Founders Tell Themselves
     {
       type:    'content',
       heading: 'What founders tell themselves',
@@ -67,7 +78,7 @@ export default {
           </div>
           <div class="pb-a">
             <div class="pb-a-label">The Reality</div>
-            <div class="pb-a-text">Personal relationships are a fantastic door-opener, but a terrible long-term strategy. The buyer you have known for twenty years is going to retire. They will be replaced by someone who does not know you, does not care about your history, and has been given a strict mandate to cut supply chain costs by 8%. Relationships get you in the room. Undeniable strategic value keeps you in the room.</div>
+            <div class="pb-a-text">Personal relationships are a fantastic door-opener, but a terrible long-term strategy. The buyer you have known for twenty years is going to retire. They will be replaced by someone who does not know you, does not care about your history, and has been given a strict mandate to cut supply chain costs by 8%. When that happens, your relationship disappears overnight and you are right back on the Excel spreadsheet. Relationships get you in the room; undeniable strategic value keeps you in the room.</div>
           </div>
         </div>
         <div class="pushback">
@@ -77,15 +88,15 @@ export default {
           </div>
           <div class="pb-a">
             <div class="pb-a-label">The Reality</div>
-            <div class="pb-a-text">You should lose the clients who only care about price. If a client is willing to abandon you over a 2% price difference despite your flawless track record, they were never your partner — they were a mercenary. Clinging to bad, low-margin clients prevents you from having the capacity to serve high-margin clients who actually value your expertise. A strong brand repels as much as it attracts.</div>
+            <div class="pb-a-text">You should lose the clients who only care about price. If a client is willing to abandon you over a 2% price difference despite your flawless track record, they were never your partner — they were a mercenary. Clinging to bad, low-margin clients prevents you from having the capacity to serve high-margin clients who actually value your expertise. A strong brand repels as much as it attracts. You must be willing to let the price-shoppers walk away so you can focus entirely on the value-buyers.</div>
           </div>
         </div>`
     },
 
-    // SCREEN 4 — Exchange
+    // SCREEN 5 — Exchange
     { type: 'exchange' },
 
-    // SCREEN 5 — End
+    // SCREEN 6 — End
     {
       type:      'end',
       nextTitle: 'Brand Is Not Marketing'

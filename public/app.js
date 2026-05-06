@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ── CONSTANTS ──
-const RAILWAY_URL = 'https://your-railway-app.up.railway.app';
+const RAILWAY_URL = 'https://manufacturing-strategy-ebook-railwaysite-production.up.railway.app';
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──
@@ -810,6 +810,8 @@ function go(from, to) {
     if (screens[to]?.type === 'diagnosis-loading') {
       setTimeout(loadDiagnosisData, 600);
     }
+    // If vikram screen, trigger typewriter
+    if (screens[to]?.type === 'vikram') {
       setTimeout(typeVikramIntro, 300);
     }
     // If vikram closing screen, trigger typewriter

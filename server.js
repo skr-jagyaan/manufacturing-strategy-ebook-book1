@@ -1,15 +1,15 @@
-const express    = require('express');
-const cors       = require('cors');
-const crypto     = require('crypto');
-const nodemailer = require('nodemailer');
-const { Pool }   = require('pg');
-const path       = require('path');
+const express        = require('express');
+const cors           = require('cors');
+const crypto         = require('crypto');
+const nodemailer     = require('nodemailer');
+const path           = require('path');
+const admin          = require('firebase-admin');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ─── CONFIG ─────────────────────────────────────────────────────────────────
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
 const CONFIG = {
   EMAIL_HOST:  process.env.EMAIL_HOST  || 'mail.sudharsankr.co.in',
   EMAIL_PORT:  process.env.EMAIL_PORT  || 587,
@@ -20,34 +20,40 @@ const CONFIG = {
   GEMINI_KEY:  process.env.GEMINI_API_KEY,
 };
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
 
-// ─── DATABASE ────────────────────────────────────────────────────────────────
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+// ─── FIREBASE INIT ───────────────────────────────────────────────────────────
+// On Cloud Run, uses Application Default Credentials automatically.
+// Locally, set GOOGLE_APPLICATION_CREDENTIALS to your service account JSON path.
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  projectId:  process.env.FIREBASE_PROJECT_ID
 });
 
-async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS buyers (
-      id              SERIAL PRIMARY KEY,
-      name            TEXT NOT NULL,
-      email           TEXT UNIQUE NOT NULL,
-      password        TEXT NOT NULL,
-      payment_id      TEXT,
-      session_token   TEXT,
-      session_expires TIMESTAMPTZ,
-      created_at      TIMESTAMPTZ DEFAULT NOW()
-    )
-  `);
-  console.log('Database ready.');
+const db      = admin.firestore();
+const buyers  = db.collection('buyers');
+
+// ─── FIRESTORE HELPERS ───────────────────────────────────────────────────────
+async function getBuyerByEmail(email) {
+  const snap = await buyers.doc(email).get();
+  return snap.exists ? snap.data() : null;
+}
+
+async function createBuyer(email, data) {
+  await buyers.doc(email).set({
+    ...data,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function updateBuyer(email, data) {
+  await buyers.doc(email).update(data);
 }
 
 // ─── EMAIL ───────────────────────────────────────────────────────────────────
 const transporter = nodemailer.createTransport({
   host:   CONFIG.EMAIL_HOST,
-  port:   CONFIG.EMAIL_PORT,
+  port:   Number(CONFIG.EMAIL_PORT),
   secure: false,
   auth:   { user: CONFIG.EMAIL_USER, pass: CONFIG.EMAIL_PASS }
 });
@@ -100,9 +106,7 @@ function generatePassword() {
   return crypto.randomBytes(10).toString('base64').slice(0, 12);
 }
 
-// ─── AUTH MIDDLEWARE ─────────────────────────────────────────────────────────
-// Protects /api/agent and /api/diagnosis
-// Expects headers: x-reader-email and x-reader-token
+// ─── AUTH MIDDLEWARE ──────────────────────────────────────────────────────────
 async function requireAuth(req, res, next) {
   const email = req.headers['x-reader-email'];
   const token = req.headers['x-reader-token'];
@@ -110,11 +114,13 @@ async function requireAuth(req, res, next) {
   if (!email || !token) return res.status(401).json({ error: 'Unauthorised' });
 
   try {
-    const result = await pool.query('SELECT * FROM buyers WHERE email = $1', [email]);
-    const buyer  = result.rows[0];
+    const buyer = await getBuyerByEmail(email);
 
-    if (!buyer || buyer.session_token !== token)      return res.status(401).json({ error: 'Unauthorised' });
-    if (new Date(buyer.session_expires) < new Date()) return res.status(401).json({ error: 'Session expired' });
+    if (!buyer || buyer.sessionToken !== token)
+      return res.status(401).json({ error: 'Unauthorised' });
+
+    if (new Date(buyer.sessionExpires) < new Date())
+      return res.status(401).json({ error: 'Session expired' });
 
     req.buyer = buyer;
     next();
@@ -124,38 +130,34 @@ async function requireAuth(req, res, next) {
   }
 }
 
-// ─── STATIC FILES ────────────────────────────────────────────────────────────
-// Book app files — served before API routes
+// ─── STATIC FILES ─────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/chapters',     express.static(path.join(__dirname, 'chapters')));
 app.use('/onboarding',   express.static(path.join(__dirname, 'onboarding')));
 app.use('/workbook.pdf', express.static(path.join(__dirname, 'assets', 'workbook.pdf')));
 
-// ─── EXISTING ROUTES ─────────────────────────────────────────────────────────
+// ─── ROUTES ───────────────────────────────────────────────────────────────────
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-// Payment success
+// Payment success — called by Razorpay after payment
 app.post('/payment-success', async (req, res) => {
   const { payment_id, name, email } = req.body;
   if (!payment_id || !name || !email) return res.status(400).json({ error: 'Missing fields' });
 
   try {
-    const existing = await pool.query('SELECT * FROM buyers WHERE email = $1', [email]);
+    const existing = await getBuyerByEmail(email);
 
-    if (existing.rows.length > 0) {
-      await sendCredentialsEmail(name, email, existing.rows[0].password);
+    if (existing) {
+      await sendCredentialsEmail(name, email, existing.password);
       return res.json({ success: true, message: 'Credentials resent' });
     }
 
     const password = generatePassword();
-    await pool.query(
-      'INSERT INTO buyers (name, email, password, payment_id) VALUES ($1, $2, $3, $4)',
-      [name, email, password, payment_id]
-    );
-
+    await createBuyer(email, { name, email, password, paymentId: payment_id });
     await sendCredentialsEmail(name, email, password);
+
     res.json({ success: true });
 
   } catch (err) {
@@ -170,20 +172,15 @@ app.post('/login', async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
 
   try {
-    const result = await pool.query('SELECT * FROM buyers WHERE email = $1', [email]);
-    const buyer  = result.rows[0];
+    const buyer = await getBuyerByEmail(email);
 
-    if (!buyer || buyer.password !== password) {
+    if (!buyer || buyer.password !== password)
       return res.status(401).json({ error: 'Invalid credentials' });
-    }
 
     const token   = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    await pool.query(
-      'UPDATE buyers SET session_token = $1, session_expires = $2 WHERE email = $3',
-      [token, expires, email]
-    );
+    await updateBuyer(email, { sessionToken: token, sessionExpires: expires });
 
     res.json({ success: true, token, name: buyer.name });
 
@@ -199,11 +196,13 @@ app.post('/verify', async (req, res) => {
   if (!email || !token) return res.status(401).json({ valid: false });
 
   try {
-    const result = await pool.query('SELECT * FROM buyers WHERE email = $1', [email]);
-    const buyer  = result.rows[0];
+    const buyer = await getBuyerByEmail(email);
 
-    if (!buyer || buyer.session_token !== token)      return res.status(401).json({ valid: false });
-    if (new Date(buyer.session_expires) < new Date()) return res.status(401).json({ valid: false, reason: 'expired' });
+    if (!buyer || buyer.sessionToken !== token)
+      return res.status(401).json({ valid: false });
+
+    if (new Date(buyer.sessionExpires) < new Date())
+      return res.status(401).json({ valid: false });
 
     res.json({ valid: true, name: buyer.name });
 
@@ -213,9 +212,7 @@ app.post('/verify', async (req, res) => {
   }
 });
 
-// ─── BOOK API ROUTES ─────────────────────────────────────────────────────────
-
-// Vikram agent — chapter and book-level notes via Gemini
+// Vikram agent — Gemini proxy
 app.post('/api/agent', requireAuth, async (req, res) => {
   const { userName, userRev, userSector, chapter, chapterTitle, takeaways, isBookLevel = false } = req.body;
 
@@ -253,9 +250,8 @@ app.post('/api/agent', requireAuth, async (req, res) => {
     try { parsed = JSON.parse(clean); }
     catch (e) { return res.status(502).json({ error: 'Agent response malformed.' }); }
 
-    if (!parsed.perspectives || parsed.perspectives.length !== 3) {
+    if (!parsed.perspectives || parsed.perspectives.length !== 3)
       return res.status(502).json({ error: 'Agent response incomplete.' });
-    }
 
     res.json(parsed);
 
@@ -265,7 +261,7 @@ app.post('/api/agent', requireAuth, async (req, res) => {
   }
 });
 
-// Sudharsan diagnosis — synthesises all takeaways
+// Sudharsan diagnosis
 app.post('/api/diagnosis', requireAuth, async (req, res) => {
   const { userName, userRev, userSector, allTakeaways, bookTakeaways } = req.body;
 
@@ -308,7 +304,7 @@ app.post('/api/diagnosis', requireAuth, async (req, res) => {
   }
 });
 
-// ─── SPA CATCH-ALL — must be last ────────────────────────────────────────────
+// ─── SPA CATCH-ALL — must be last ─────────────────────────────────────────────
 app.get('*', (req, res) => {
   const apiRoutes = ['/api', '/payment-success', '/login', '/verify', '/health'];
   if (apiRoutes.some(r => req.path.startsWith(r))) {
@@ -318,12 +314,11 @@ app.get('*', (req, res) => {
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-initDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Gemini: ${CONFIG.GEMINI_KEY ? 'configured' : 'NOT SET'}`);
-  });
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Gemini: ${CONFIG.GEMINI_KEY ? 'configured' : 'NOT SET'}`);
+  console.log(`Firebase: ${process.env.FIREBASE_PROJECT_ID || 'project ID not set'}`);
 });
 
 /* ─── PROMPT BUILDERS ────────────────────────────────────────────────────────*/

@@ -111,11 +111,12 @@ async function requireAuth(req, res, next) {
   const email = req.headers['x-reader-email'];
   const token = req.headers['x-reader-token'];
 
-  if (!email || !token) return res.status(401).json({ error: 'Unauthorised' });
+  if (!email || !token) { console.error("requireAuth: missing headers", {email, token}); return res.status(401).json({ error: "Unauthorised" }); }
 
   try {
     const buyer = await getBuyerByEmail(email);
 
+    console.error("requireAuth: buyer=", buyer?.sessionToken?.substring(0,10), "token=", token?.substring(0,10));
     if (!buyer || buyer.sessionToken !== token)
       return res.status(401).json({ error: 'Unauthorised' });
 
@@ -198,6 +199,7 @@ app.post('/verify', async (req, res) => {
   try {
     const buyer = await getBuyerByEmail(email);
 
+    console.error("requireAuth: buyer=", buyer?.sessionToken?.substring(0,10), "token=", token?.substring(0,10));
     if (!buyer || buyer.sessionToken !== token)
       return res.status(401).json({ valid: false });
 

@@ -269,9 +269,10 @@ function logout() {
 function getRoute() {
   const path = window.location.pathname;
 
-  if (path === '/' || path === '')                   return { type: 'onboarding' };
-  if (path === '/backmatter')                         return { type: 'backmatter' };
-  if (path === '/diagnosis')                          return { type: 'diagnosis' };
+  if (path === '/' || path === '')                   return { type: 'shelf' };
+  if (path === '/read')                              return { type: 'onboarding' };
+  if (path === '/backmatter')                        return { type: 'backmatter' };
+  if (path === '/diagnosis')                         return { type: 'diagnosis' };
 
   const chMatch = path.match(/^\/chapter\/(\d+)$/);
   if (chMatch) {
@@ -288,38 +289,50 @@ function navigate(path, options = {}) {
   route();
 }
 
-async function route() {
+async function route(options = {}) {
   // ── SESSION GATE ──────────────────────────────────────────
   if (!hasSession()) {
     loadLogin();
     return;
   }
 
-  // Verify session is still valid on the server
-  const { email, token } = getSession();
-  try {
-    const res  = await fetch(RAILWAY_URL + '/verify', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email, token })
-    });
-    const data = await res.json();
-    if (!data.valid) {
-      clearSession();
-      loadLogin();
-      return;
+  // Only verify with server on fresh page load, not on internal navigation
+  const lastVerified = parseInt(sessionStorage.getItem('lastVerified') || '0');
+  const now = Date.now();
+  const shouldVerify = options.forceVerify || (now - lastVerified > 5 * 60 * 1000); // 5 minutes
+
+  if (shouldVerify) {
+    const { email, token } = getSession();
+    try {
+      const res  = await fetch(RAILWAY_URL + '/verify', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email, token })
+      });
+      const data = await res.json();
+      if (!data.valid) {
+        clearSession();
+        loadLogin();
+        return;
+      }
+      sessionStorage.setItem('lastVerified', now.toString());
+    } catch (err) {
+      console.warn('Session verify failed (offline?), proceeding with cached session.');
     }
-  } catch (err) {
-    // Network error — allow offline reading if token exists locally
-    console.warn('Session verify failed (offline?), proceeding with cached session.');
   }
   // ─────────────────────────────────────────────────────────
 
   const r = getRoute();
 
-  // Root path → always show shelf first
-  if (r.type === 'onboarding') {
+  // Root path → shelf
+  if (r.type === 'shelf') {
     loadShelf();
+    return;
+  }
+
+  // /read path → onboarding
+  if (r.type === 'onboarding') {
+    await loadOnboarding();
     return;
   }
 
@@ -394,6 +407,11 @@ async function loadOnboarding() {
   try {
     const module = await import('/onboarding/onboarding.js');
     currentChapter = module.default;
+
+    // Push state so browser back doesn't trigger route() back to shelf
+    if (window.location.pathname === '/') {
+      history.pushState({}, '', '/read');
+    }
 
     document.getElementById('bar-book').textContent = 'Why Great Manufacturers Stay Invisible';
     document.getElementById('bar-sep').style.display = 'none';
@@ -1424,7 +1442,7 @@ function showError() {
 }
 
 // ── BROWSER BACK/FORWARD ──
-window.addEventListener('popstate', () => route());
+window.addEventListener('popstate', () => route({ forceVerify: false }));
 
 // ── KEYBOARD NAVIGATION ──
 document.addEventListener('keydown', e => {

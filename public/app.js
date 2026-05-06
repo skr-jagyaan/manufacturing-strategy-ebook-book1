@@ -347,7 +347,7 @@ function renderScreen(screen, idx, total) {
           <span></span>
         </div>`;
 
-    case 'end':
+    case 'end': {
       const nextNum = (currentChapter?.chapterNum || 0) + 1;
       const isLastChapter = currentChapter?.chapterNum === 9;
       const nextBtn = isLastChapter
@@ -364,7 +364,6 @@ function renderScreen(screen, idx, total) {
              onclick="goToDiagnosis()">
              Get My Strategic Diagnosis →
            </button>`;
-
       return `
         <div class="screen-body center">
           <div class="end-wrap">
@@ -386,6 +385,7 @@ function renderScreen(screen, idx, total) {
           <span class="screen-ctr">${idx + 1} of ${total}</span>
           <span></span>
         </div>`;
+    }
 
     case 'backmatter-prose':
       return `
@@ -650,7 +650,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
           <button class="btn btn-primary" onclick="go(${idx}, ${idx + 1})">Continue →</button>
         </div>`;
 
-    case 'toc':
+    case 'toc': {
       const lastCh = getLastChapter();
       const resumeBtn = lastCh >= 1
         ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh})">Continue Reading — Chapter ${lastCh} →</button>`
@@ -667,6 +667,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
           <span class="screen-ctr">${idx + 1} of ${total}</span>
           ${resumeBtn}
         </div>`;
+    }
 
     case 'preface':
     case 'whoshouldread':

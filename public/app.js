@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ── CONSTANTS ──
-const RAILWAY_URL = 'https://your-railway-app.up.railway.app';
+const RAILWAY_URL = 'https://manufacturing-strategy-ebook-railwaysite-production.up.railway.app';
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──

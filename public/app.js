@@ -29,6 +29,14 @@ function saveUser(name, rev, sector) {
   localStorage.setItem('readerSector', sector);
 }
 
+function markWorkbookDownloaded() {
+  localStorage.setItem('workbookDownloaded', 'true');
+  setTimeout(() => {
+    const btn = document.getElementById('workbook-continue-btn');
+    if (btn) btn.textContent = 'Continue →';
+  }, 1000);
+}
+
 function isOnboarded() {
   return !!(localStorage.getItem('readerName') &&
             localStorage.getItem('readerRev')  &&
@@ -711,7 +719,7 @@ function renderScreen(screen, idx, total) {
             <div class="prose" style="margin-bottom:32px;">
               <p>${screen.body.replace(/\n/g, '</p><p>')}</p>
             </div>
-            <a href="/workbook.pdf" download class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;text-decoration:none;">
+            <a href="/assets/workbook.pdf" download id="workbook-download-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;text-decoration:none;" onclick="markWorkbookDownloaded()">
               Download Workbook →
             </a>
           </div>
@@ -719,7 +727,7 @@ function renderScreen(screen, idx, total) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <button class="btn btn-ghost" onclick="go(${idx}, ${idx + 1})">Continue without downloading</button>
+          <button class="btn btn-ghost" id="workbook-continue-btn" onclick="go(${idx}, ${idx + 1})">${localStorage.getItem('workbookDownloaded') ? 'Continue →' : 'Continue without downloading'}</button>
         </div>`;
 
     case 'diagnosis-teaser':
@@ -828,7 +836,7 @@ function renderScreen(screen, idx, total) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <span></span>
+          <button class="btn btn-primary" onclick="loadShelf()">Back to My Library →</button>
         </div>`;
   }
 }
@@ -1481,11 +1489,12 @@ window.submitTakeaways     = submitTakeaways;
 window.submitBookTakeaways = submitBookTakeaways;
 window.checkInputs         = checkInputs;
 window.loadDiagnosisData   = loadDiagnosisData;
-window.submitLogin         = submitLogin;
-window.logout              = logout;
-window.navigate            = navigate;
-window.loadOnboarding      = loadOnboarding;
-window.loadShelf           = loadShelf;
+window.submitLogin             = submitLogin;
+window.logout                  = logout;
+window.navigate                = navigate;
+window.loadOnboarding          = loadOnboarding;
+window.loadShelf               = loadShelf;
+window.markWorkbookDownloaded  = markWorkbookDownloaded;
 
 // ── INIT ──
 route();

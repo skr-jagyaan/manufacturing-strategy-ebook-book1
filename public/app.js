@@ -6,6 +6,7 @@
 
 // ── CONSTANTS ──
 const RAILWAY_URL = 'https://manufacturing-series-65462349033.asia-south1.run.app';
+const SHELF_URL   = 'https://shelf.sudharsankr.co.in'; // Redirect here if no valid session
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──
@@ -93,183 +94,15 @@ function hasSession() {
   return !!(email && token);
 }
 
-// ── LOGIN SCREEN ──
-function loadLogin() {
-  const stage = document.getElementById('stage');
-  stage.innerHTML = `
-    <div class="screen active" id="sc-login">
-      <div class="screen-body center">
-        <div class="login-screen-wrap">
-          <div class="login-screen-series">The Manufacturing Strategy Series</div>
-          <div class="login-screen-title">Sign in to read</div>
-          <div class="login-screen-sub">Use the credentials sent to your email after purchase.</div>
-          <div class="login-screen-error" id="login-error"></div>
-          <div class="field">
-            <label>Email</label>
-            <input id="login-email" type="email" placeholder="your@email.com" autocomplete="email">
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <input id="login-password" type="password" placeholder="Your password" autocomplete="current-password">
-          </div>
-          <button class="btn btn-primary login-screen-btn" id="login-submit" onclick="submitLogin()">Sign in →</button>
-        </div>
-      </div>
-      <div class="screen-footer">
-        <span></span>
-        <span class="screen-ctr" style="color:var(--ink-3);font-size:0.75rem;">© 2026 Sudharsan K R</span>
-        <span></span>
-      </div>
-    </div>`;
 
-  // Update top bar
-  document.getElementById('bar-book').textContent = 'The Manufacturing Strategy Series';
-  document.getElementById('bar-sep').style.display = 'none';
-  document.getElementById('bar-ch').textContent = '';
-  document.getElementById('dots').innerHTML = '';
-  document.getElementById('bar-shelf-btn').style.display = 'none';
 
-  hideLoader();
-  setTimeout(() => document.getElementById('login-email')?.focus(), 100);
-}
 
-async function submitLogin() {
-  const email    = document.getElementById('login-email')?.value?.trim();
-  const password = document.getElementById('login-password')?.value?.trim();
-  const btn      = document.getElementById('login-submit');
-
-  if (!email || !password) {
-    showLoginError('Please enter your email and password.');
-    return;
-  }
-
-  btn.disabled    = true;
-  btn.textContent = 'Signing in…';
-  document.getElementById('login-error')?.classList.remove('show');
-
-  try {
-    const res  = await fetch(RAILWAY_URL + '/login', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      showLoginError(data.error || 'Invalid email or password.');
-      btn.disabled    = false;
-      btn.textContent = 'Sign in →';
-      return;
-    }
-
-    saveSession(email, data.token, data.name);
-    loadShelf();
-
-  } catch (err) {
-    showLoginError('Connection error. Please try again.');
-    btn.disabled    = false;
-    btn.textContent = 'Sign in →';
-  }
-}
-
-function showLoginError(msg) {
-  const el = document.getElementById('login-error');
-  if (el) { el.textContent = msg; el.classList.add('show'); }
-}
-
-// ── SHELF SCREEN ──
-function loadShelf() {
-  const { name } = getUser();
-  const firstName = name ? name.split(' ')[0] : 'Founder';
-  const lastCh = getLastChapter();
-  const hasStarted = lastCh >= 1;
-
-  const book1Cta  = hasStarted
-    ? `<button class="btn btn-primary" onclick="goToChapter(${lastCh}, true)">Continue Reading →</button>`
-    : `<button class="btn btn-primary" onclick="loadOnboarding()">Begin Reading →</button>`;
-
-  const stage = document.getElementById('stage');
-  stage.innerHTML = `
-    <div class="screen active" id="sc-shelf">
-      <div class="screen-body">
-        <div class="shelf-wrap">
-          <div class="shelf-greeting">Welcome back, ${firstName}.</div>
-          <div class="shelf-label">Your Library</div>
-          <div class="shelf-grid">
-
-            <div class="shelf-card shelf-card--active">
-              <div class="shelf-card-num">01</div>
-              <div class="shelf-card-tag">Brand & Visibility</div>
-              <div class="shelf-card-title">Why Great Manufacturers Stay Invisible</div>
-              <div class="shelf-card-body">Brand, positioning, and visibility — why quality alone never builds a manufacturer's reputation.</div>
-              <div class="shelf-card-footer">
-                ${book1Cta}
-              </div>
-            </div>
-
-            <div class="shelf-card shelf-card--soon">
-              <div class="shelf-card-num">02</div>
-              <div class="shelf-card-tag">Strategy Design</div>
-              <div class="shelf-card-title">Stop Planning, Start Winning</div>
-              <div class="shelf-card-body">The strategy design framework for manufacturers tired of annual plans that never move the needle.</div>
-              <div class="shelf-card-footer">
-                <span class="shelf-card-soon">Coming Soon</span>
-              </div>
-            </div>
-
-            <div class="shelf-card shelf-card--soon">
-              <div class="shelf-card-num">03</div>
-              <div class="shelf-card-tag">Capital & Risk</div>
-              <div class="shelf-card-title">Don't Bet the Business</div>
-              <div class="shelf-card-body">How to test your biggest assumptions before committing capital — scale without betting everything.</div>
-              <div class="shelf-card-footer">
-                <span class="shelf-card-soon">Coming Soon</span>
-              </div>
-            </div>
-
-            <div class="shelf-card shelf-card--soon">
-              <div class="shelf-card-num">04</div>
-              <div class="shelf-card-tag">Scale Archetypes</div>
-              <div class="shelf-card-title">Decoding the Rs. 100 Cr Breakthrough</div>
-              <div class="shelf-card-body">Real archetypes of Indian manufacturers who crossed ₹100 Cr — and the exact moves that got them there.</div>
-              <div class="shelf-card-footer">
-                <span class="shelf-card-soon">Coming Soon</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <div class="screen-footer">
-        <span></span>
-        <span></span>
-        <button class="btn btn-ghost" onclick="logout()">Sign out</button>
-      </div>
-    </div>`;
-
-  // Update top bar
-  document.getElementById('bar-book').textContent = 'The Manufacturing Strategy Series';
-  document.getElementById('bar-sep').style.display = 'none';
-  document.getElementById('bar-ch').textContent = '';
-  document.getElementById('dots').innerHTML = '';
-  document.getElementById('bar-shelf-btn').style.display = 'none';
-
-  hideLoader();
-}
-
-function logout() {
-  clearSession();
-  localStorage.removeItem('readerName');
-  localStorage.removeItem('readerRev');
-  localStorage.removeItem('readerSector');
-  loadLogin();
-}
 
 
 function getRoute() {
   const path = window.location.pathname;
 
-  if (path === '/' || path === '')                   return { type: 'shelf' };
+  if (path === '/' || path === '')                   return { type: 'onboarding' };
   if (path === '/read')                              return { type: 'onboarding' };
   if (path === '/backmatter')                        return { type: 'backmatter' };
   if (path === '/diagnosis')                         return { type: 'diagnosis' };
@@ -290,49 +123,53 @@ function navigate(path, options = {}) {
 }
 
 async function route(options = {}) {
-  // ── SESSION GATE ──────────────────────────────────────────
-  if (!hasSession()) {
-    loadLogin();
-    return;
-  }
+  // ── TOKEN HANDOFF ─────────────────────────────────────────
+  // On first load from shelf, URL contains ?token=xxx&email=yyy
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlToken  = urlParams.get('token');
+  const urlEmail  = urlParams.get('email');
 
-  // Only verify with server on fresh page load, not on internal navigation
-  const lastVerified = parseInt(sessionStorage.getItem('lastVerified') || '0');
-  const now = Date.now();
-  const shouldVerify = options.forceVerify || (now - lastVerified > 5 * 60 * 1000); // 5 minutes
-
-  if (shouldVerify) {
-    const { email, token } = getSession();
+  if (urlToken && urlEmail) {
+    showLoader();
     try {
-      const res  = await fetch(RAILWAY_URL + '/verify', {
+      const res  = await fetch(RAILWAY_URL + '/validate-token', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email, token })
+        body:    JSON.stringify({ email: urlEmail, token: urlToken })
       });
       const data = await res.json();
-      if (!data.valid) {
-        clearSession();
-        loadLogin();
+
+      if (data.valid) {
+        saveSession(urlEmail, urlToken, data.name);
+        // Clean token from URL without triggering a re-route
+        const cleanPath = window.location.pathname;
+        history.replaceState({}, '', cleanPath);
+      } else {
+        window.location.href = SHELF_URL;
         return;
       }
-      sessionStorage.setItem('lastVerified', now.toString());
     } catch (err) {
-      console.warn('Session verify failed (offline?), proceeding with cached session.');
+      console.warn('Token validation failed (offline?), checking localStorage.');
     }
+  }
+
+  // ── SESSION GATE ──────────────────────────────────────────
+  if (!hasSession()) {
+    window.location.href = SHELF_URL;
+    return;
   }
   // ─────────────────────────────────────────────────────────
 
   const r = getRoute();
 
-  // Root path → shelf
-  if (r.type === 'shelf') {
-    loadShelf();
-    return;
-  }
-
-  // /read path → onboarding
+  // Root / or /read → onboarding (resumes if already started)
   if (r.type === 'onboarding') {
-    await loadOnboarding();
+    const lastCh = getLastChapter();
+    if (lastCh >= 1) {
+      await loadChapter(lastCh);
+    } else {
+      await loadOnboarding();
+    }
     return;
   }
 
@@ -351,8 +188,8 @@ async function route(options = {}) {
     return;
   }
 
-  // 404 — go to shelf
-  loadShelf();
+  // 404 — go to onboarding
+  await loadOnboarding();
 }
 
 // ── CHAPTER LOADER ──
@@ -868,7 +705,7 @@ function renderScreen(screen, idx, total) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <button class="btn btn-primary" onclick="loadShelf()">Back to My Library →</button>
+          <button class="btn btn-primary" onclick="window.location.href=SHELF_URL">Back to My Library →</button>
         </div>`;
   }
 }
@@ -1459,19 +1296,11 @@ window.addEventListener('popstate', () => route({ forceVerify: false }));
 
 // ── KEYBOARD NAVIGATION ──
 document.addEventListener('keydown', e => {
-  // Enter submits login form when login screen is visible
-  if (e.key === 'Enter' && document.getElementById('sc-login')) {
-    submitLogin();
-    return;
-  }
-
   const screen = document.getElementById('sc-' + currentScreen);
   const screenBody = screen?.querySelector('.screen-body');
   const screenType = getCurrentScreenType();
 
-  // Block navigation on shelf, login, form and vikram screens
-  if (document.getElementById('sc-shelf')) return;
-  if (document.getElementById('sc-login')) return;
+  // Block navigation on form and vikram screens
   if (screenType === 'form' || screenType === 'vikram') return;
 
   // Up/Down arrows scroll content, not navigate
@@ -1522,12 +1351,9 @@ window.submitTakeaways     = submitTakeaways;
 window.submitBookTakeaways = submitBookTakeaways;
 window.checkInputs         = checkInputs;
 window.loadDiagnosisData   = loadDiagnosisData;
-window.submitLogin             = submitLogin;
-window.logout                  = logout;
-window.navigate                = navigate;
-window.loadOnboarding          = loadOnboarding;
-window.loadShelf               = loadShelf;
-window.markWorkbookDownloaded  = markWorkbookDownloaded;
+window.navigate            = navigate;
+window.loadOnboarding      = loadOnboarding;
+window.markWorkbookDownloaded = markWorkbookDownloaded;
 
 // ── INIT ──
 route();

@@ -167,39 +167,14 @@ app.post('/payment-success', async (req, res) => {
   }
 });
 
-// Login
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
-
-  try {
-    const buyer = await getBuyerByEmail(email);
-
-    if (!buyer || buyer.password !== password)
-      return res.status(401).json({ error: 'Invalid credentials' });
-
-    const token   = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-    await updateBuyer(email, { sessionToken: token, sessionExpires: expires });
-
-    res.json({ success: true, token, name: buyer.name });
-
-  } catch (err) {
-    console.error('login error:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Verify session
-app.post('/verify', async (req, res) => {
+// Validate token — called by Book 1 on first load (token handoff from shelf)
+app.post('/validate-token', async (req, res) => {
   const { email, token } = req.body;
   if (!email || !token) return res.status(401).json({ valid: false });
 
   try {
     const buyer = await getBuyerByEmail(email);
 
-    console.error("requireAuth: buyer=", buyer?.sessionToken?.substring(0,10), "token=", token?.substring(0,10));
     if (!buyer || buyer.sessionToken !== token)
       return res.status(401).json({ valid: false });
 
@@ -209,7 +184,7 @@ app.post('/verify', async (req, res) => {
     res.json({ valid: true, name: buyer.name });
 
   } catch (err) {
-    console.error('verify error:', err);
+    console.error('validate-token error:', err);
     res.status(401).json({ valid: false });
   }
 });
@@ -308,7 +283,7 @@ app.post('/api/diagnosis', requireAuth, async (req, res) => {
 
 // ─── SPA CATCH-ALL — must be last ─────────────────────────────────────────────
 app.get('*', (req, res) => {
-  const apiRoutes = ['/api', '/payment-success', '/login', '/verify', '/health'];
+  const apiRoutes = ['/api', '/payment-success', '/validate-token', '/health'];
   if (apiRoutes.some(r => req.path.startsWith(r))) {
     return res.status(404).json({ error: 'Not found.' });
   }

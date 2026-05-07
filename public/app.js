@@ -705,7 +705,7 @@ function renderScreen(screen, idx, total) {
         <div class="screen-footer">
           ${prevBtn}
           <span class="screen-ctr">${idx + 1} of ${total}</span>
-          <button class="btn btn-primary" onclick="window.location.href=SHELF_URL">Back to My Library →</button>
+          <button class="btn btn-primary" onclick="window.location.href='https://manufacturing-shelf-65462349033.asia-south1.run.app'">Back to My Library →</button>
         </div>`;
   }
 }

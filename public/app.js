@@ -6,7 +6,7 @@
 
 // ── CONSTANTS ──
 const RAILWAY_URL = 'https://manufacturing-series-65462349033.asia-south1.run.app';
-const SHELF_URL   = 'https://shelf.sudharsankr.co.in'; // Redirect here if no valid session
+const SHELF_URL   = 'https://manufacturing-shelf-65462349033.asia-south1.run.app'; // Redirect here if no valid session
 const TOTAL_CHAPTERS = 9;
 
 // ── STATE ──

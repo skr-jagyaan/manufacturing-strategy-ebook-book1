@@ -627,6 +627,7 @@ function renderScreen(screen, idx, total) {
     case 'introduction':
     case 'about':
     case 'form':
+    case 'companion':
     case 'vikram':
       return renderOnboardingScreen(screen, idx, total, prevBtn);
 
@@ -839,6 +840,7 @@ function renderOnboardingScreen(screen, idx, total, prevBtn) {
           <button class="btn btn-primary" onclick="submitForm(${idx})">Meet Your Reading Companion →</button>
         </div>`;
 
+    case 'companion':
     case 'vikram':
       return `
         <div class="screen-body center">
@@ -921,7 +923,7 @@ function go(from, to) {
       setTimeout(loadDiagnosisData, 600);
     }
     // If vikram screen, trigger typewriter
-    if (screens[to]?.type === 'vikram') {
+    if (screens[to]?.type === 'vikram' || screens[to]?.type === 'companion') {
       setTimeout(typeVikramIntro, 300);
     }
     // If vikram closing screen, trigger typewriter
@@ -1109,7 +1111,11 @@ async function submitBookTakeaways(nextScreenIdx) {
   document.getElementById('loading-state').classList.add('show');
 
   const user = getUser();
-  let perspectives = currentChapter.vikramPerspectives;
+  let perspectives = currentChapter.vikramPerspectives || [
+    '<strong>Invisibility is a strategic choice made by accident.</strong> Most manufacturers never decided to be invisible — they just never decided not to be.',
+    '<strong>Quality without visibility is a factory secret.</strong> The market cannot value what it cannot see, and it cannot see what you have never shown it.',
+    '<strong>The positioning decision is the hardest one.</strong> Choosing who you are for means choosing who you are not for — and most founders never make that choice explicitly.'
+  ];
 
   try {
     const controller = new AbortController();
@@ -1118,7 +1124,7 @@ async function submitBookTakeaways(nextScreenIdx) {
     const res = await fetch(RAILWAY_URL + '/api/agent', {
       method: 'POST',
       signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-reader-email': localStorage.getItem('readerEmail') || '', 'x-reader-token': localStorage.getItem('readerToken') || '' },
       body: JSON.stringify({
         userName:     user.name,
         userRev:      user.rev,
@@ -1198,7 +1204,11 @@ async function submitTakeaways(nextScreenIdx) {
   document.getElementById('loading-state').classList.add('show');
 
   const user = getUser();
-  let perspectives = currentChapter.vikramPerspectives;
+  let perspectives = currentChapter.vikramPerspectives || [
+    '<strong>Invisibility is a strategic choice made by accident.</strong> Most manufacturers never decided to be invisible — they just never decided not to be.',
+    '<strong>Quality without visibility is a factory secret.</strong> The market cannot value what it cannot see, and it cannot see what you have never shown it.',
+    '<strong>The positioning decision is the hardest one.</strong> Choosing who you are for means choosing who you are not for — and most founders never make that choice explicitly.'
+  ];
 
   try {
     const controller = new AbortController();
@@ -1207,7 +1217,7 @@ async function submitTakeaways(nextScreenIdx) {
     const res = await fetch(RAILWAY_URL + '/api/agent', {
       method: 'POST',
       signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-reader-email': localStorage.getItem('readerEmail') || '', 'x-reader-token': localStorage.getItem('readerToken') || '' },
       body: JSON.stringify({
         userName:     user.name,
         userRev:      user.rev,
